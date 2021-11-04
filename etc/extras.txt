@@ -1,0 +1,13 @@
+#!nsh
+#
+# USB MAVLink start
+#
+
+# Enable a number of interesting streams we want via USB
+mavlink stream -d /dev/ttyACM0 -s MANUAL_CONTROL -r 50
+
+# Enable RPM sensor driver
+pcf8583 start -X -b 1
+
+# Start airdata app
+airdata start

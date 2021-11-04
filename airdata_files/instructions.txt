@@ -1,0 +1,53 @@
+@file instructions.txt
+@author Jeremy Hopwood <jeremyhopwood@vt.edu>
+@description Instructions for writing a PX4 app that publishes a custom uORB message from an air data unit
+
+Clone the PX4 firmware git repository to the desired directory
+$ cd ~/PX4
+$ git clone https://github.com/PX4/PX4-Autopilot.git --recursive
+
+Revert to v1.11.3
+$ cd PX4-Autopilot
+$ git reset -q v1.11.3
+
+Set up the PX4 development enviroment
+$ bash ./Tools/setup/ubuntu.sh
+
+Define the custom message
+Place the message file, airdata.msg, in ~/PX4/PX4-Autopilot/msg/
+Add "airdata.msg" to the list of messages in ~/PX4/PX4-Autopilot/msg/CMakeLists.txt
+
+Create the directory that holds the custom module
+$ mkdir ~/PX4/PX4-Autopilot/src/modules/airdata
+and copy the following files to it:
+	airdata.cpp
+	airdata.h
+	CMakeLists.txt
+	module.yaml
+	
+See ~/PX4/PX4-Autopilot/src/templates/module/ for the template .cpp, .h, and CMakeLists.txt files.
+See ~/PX4/PX4-Autopilot/src/modules/mavlink/module.yaml for an example parameter metadata YAML file.
+
+In the CMakeLists.txt file, add 
+	MODULE_CONFIG
+		module.yaml
+after the lists of SRCS.
+
+Note: The serial port mapping for a particular board (cubeorange for this example) can be found in ~/PX4/PX4-Autopilot/boards/cubepilot/cubeorange/default.cmake
+		
+Add "airdata" to the modules in the board's CMake file ~/PX4/PX4-Autopilot/boards/cubepilot/cubeorange/default.cmake
+
+Clean and build the parameter metadata and board firmware
+$ cd ~/PX4/PX4-Autopilot/
+$ make clean
+$ make parameters_metadata
+$ make cubepilot_cubeorange
+
+Install the mavlink shell tool
+$ sudo pip3 install pymavlink pyserial
+
+To connect to the pixhawk's mavlink shell over USB (/dev/ttyACM0 for instance),
+$ cd ~/PX4/PX4-Autopilot/
+$ ./Tools/mavlink_shell.py /dev/ttyACM0
+
+
